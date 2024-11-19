@@ -22,58 +22,24 @@ function App() {
   };
 
   const deleteCard = (id: string) => {
-    setCards(cards.filter(card => card.id !== id));
+    setCards(cards.filter((card) => card.id !== id));
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <h1 className="text-2xl font-bold text-gray-900">FlashCards</h1>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setView('create')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                  view === 'create'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Plus size={20} />
-                Créer
-              </button>
-              <button
-                onClick={() => setView('list')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                  view === 'list'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <List size={20} />
-                Liste
-              </button>
-              <button
-                onClick={() => setView('study')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-                  view === 'study'
-                    ? 'bg-indigo-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                <Brain size={20} />
-                Réviser
-              </button>
-            </div>
-          </div>
+          <h1 className="text-2xl font-bold text-gray-900 py-4">FlashCards</h1>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
         {view !== 'create' && (
           <div className="mb-6">
-            <label htmlFor="category-filter" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="category-filter"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Filtrer par catégorie
             </label>
             <select
@@ -94,7 +60,7 @@ function App() {
         {view === 'create' && (
           <FlashcardForm onAdd={addCard} categories={DEFAULT_CATEGORIES} />
         )}
-        
+
         {view === 'list' && (
           <FlashcardList
             cards={cards}
@@ -102,11 +68,49 @@ function App() {
             selectedCategory={selectedCategory}
           />
         )}
-        
+
         {view === 'study' && (
           <StudyMode cards={cards} selectedCategory={selectedCategory} />
         )}
       </main>
+
+      <footer className="fixed bottom-0 left-0 w-full bg-white shadow-sm py-3">
+        <div className="max-w-7xl mx-auto px-4 flex justify-around">
+          <button
+            onClick={() => setView('create')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              view === 'create'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Plus size={20} />
+            Créer
+          </button>
+          <button
+            onClick={() => setView('list')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              view === 'list'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <List size={20} />
+            Liste
+          </button>
+          <button
+            onClick={() => setView('study')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+              view === 'study'
+                ? 'bg-indigo-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <Brain size={20} />
+            Réviser
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
