@@ -1,11 +1,12 @@
-export interface Flashcard {
-  id: string;
-  question: string;
-  answer: string;
-  category: string;
-}
-
-export interface Category {
+export type Category = {
   id: string;
   name: string;
-}
+};
+
+// Définit une flashcard avec une association à une catégorie
+export type Flashcard = {
+  id: string; // Identifiant unique de la flashcard
+  question: string; // Question de la flashcard
+  answer: string; // Réponse de la flashcard
+  categoryId: string; // Lien avec une catégorie spécifique
+};

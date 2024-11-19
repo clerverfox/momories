@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
 import { Brain, List, Plus } from 'lucide-react';
-import type { Flashcard } from './types';
+import type { Flashcard, Category } from './types';
 import FlashcardForm from './components/FlashcardForm';
 import FlashcardList from './components/FlashcardList';
 import StudyMode from './components/StudyMode';
-
-const DEFAULT_CATEGORIES = ['Général', 'Mathématiques', 'Sciences', 'Langues', 'Histoire'];
 
 function App() {
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [view, setView] = useState<'create' | 'list' | 'study'>('create');
   const [selectedCategory, setSelectedCategory] = useState('Toutes');
-  const categories = ['Toutes', ...DEFAULT_CATEGORIES];
+  const [categories, setCategories] = useState<Category[]>([
+    { id: crypto.randomUUID(), name: 'Général' },
+    { id: crypto.randomUUID(), name: 'Mathématiques' },
+  ]);
+
+  const addCategory = (name: string) => {
+    const newCategory: Category = { id: crypto.randomUUID(), name };
+    setCategories((prev) => [...prev, newCategory]);
+  };
+
+  const deleteCategory = (id: string) => {
+    setCategories((prev) => prev.filter((category) => category.id !== id));
+  };
 
   const addCard = (card: Omit<Flashcard, 'id'>) => {
     const newCard: Flashcard = {
@@ -25,6 +35,11 @@ function App() {
     setCards(cards.filter((card) => card.id !== id));
   };
 
+  const getButtonClass = (active: boolean) =>
+    `flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+      active ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    }`;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -34,31 +49,8 @@ function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
-        {view !== 'create' && (
-          <div className="mb-6">
-            <label
-              htmlFor="category-filter"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Filtrer par catégorie
-            </label>
-            <select
-              id="category-filter"
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-
         {view === 'create' && (
-          <FlashcardForm onAdd={addCard} categories={DEFAULT_CATEGORIES} />
+          <FlashcardForm onAdd={addCard} categories={categories} />
         )}
 
         {view === 'list' && (
@@ -66,6 +58,10 @@ function App() {
             cards={cards}
             onDelete={deleteCard}
             selectedCategory={selectedCategory}
+            onCategoryChange={(categoryId) => setSelectedCategory(categoryId)}
+            categories={categories}
+            onAddCategory={addCategory}
+            onDeleteCategory={deleteCategory}
           />
         )}
 
@@ -78,33 +74,21 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 flex justify-around">
           <button
             onClick={() => setView('create')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-              view === 'create'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={getButtonClass(view === 'create')}
           >
             <Plus size={20} />
             Créer
           </button>
           <button
             onClick={() => setView('list')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-              view === 'list'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={getButtonClass(view === 'list')}
           >
             <List size={20} />
             Liste
           </button>
           <button
             onClick={() => setView('study')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-              view === 'study'
-                ? 'bg-indigo-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={getButtonClass(view === 'study')}
           >
             <Brain size={20} />
             Réviser

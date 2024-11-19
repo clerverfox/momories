@@ -1,44 +1,49 @@
 import React, { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
-import type { Flashcard } from '../types';
+import type { Flashcard, Category } from '../types';
 
 interface FlashcardFormProps {
   onAdd: (card: Omit<Flashcard, 'id'>) => void;
-  categories: string[];
+  categories: Category[]; // Tableau simple de catégories
 }
 
 export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps) {
   const [formData, setFormData] = useState({
     question: '',
     answer: '',
-    category: categories[0] || '',
+    categoryId: categories.length > 0 ? categories[0].id : '', // Défaut : première catégorie
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.question.trim() && formData.answer.trim()) {
+    if (formData.question.trim() && formData.answer.trim() && formData.categoryId) {
       onAdd(formData);
-      setFormData({ question: '', answer: '', category: categories[0] || '' });
+      setFormData({
+        question: '',
+        answer: '',
+        categoryId: categories.length > 0 ? categories[0].id : '', // Réinitialisation
+      });
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Créer une nouvelle carte</h2>
-      
+
       <div>
         <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
           Catégorie
         </label>
         <select
           id="category"
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          value={formData.categoryId}
+          onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
           className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          required
         >
           {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
+            <option key={category.id} value={category.id}>
+              {category.name}
             </option>
           ))}
         </select>
