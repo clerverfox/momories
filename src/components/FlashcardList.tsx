@@ -10,6 +10,7 @@ interface FlashcardListProps {
   categories: Category[];
   onAddCategory: (name: string) => void;
   onDeleteCategory: (id: string) => void;
+  onUpdateCategoryColor: (id: string, color: string) => void; // Nouvelle prop
 }
 
 const FlashcardList: React.FC<FlashcardListProps> = ({
@@ -20,6 +21,7 @@ const FlashcardList: React.FC<FlashcardListProps> = ({
   categories,
   onAddCategory,
   onDeleteCategory,
+  onUpdateCategoryColor,
 }) => {
   const [newCategory, setNewCategory] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,10 +33,9 @@ const FlashcardList: React.FC<FlashcardListProps> = ({
     }
   };
 
-  // Filtrer les cartes en fonction de la catégorie sélectionnée
   const filteredCards = selectedCategory === 'Toutes'
-    ? cards // Si "Toutes" est sélectionnée, afficher toutes les cartes
-    : cards.filter((card) => card.categoryId === selectedCategory); // Sinon, filtrer par catégorie
+    ? cards
+    : cards.filter((card) => card.categoryId === selectedCategory);
 
   return (
     <div className="space-y-4">
@@ -66,23 +67,30 @@ const FlashcardList: React.FC<FlashcardListProps> = ({
       </div>
 
       <ul className="space-y-2">
-        {filteredCards.map((card) => (
-          <li key={card.id} className="flex justify-between items-center bg-white p-4 rounded-md shadow">
-            <div>
-              <h3 className="font-medium">{card.question}</h3>
-              <p className="text-sm text-gray-600">{card.answer}</p>
-            </div>
-            <button
-              onClick={() => onDelete(card.id)}
-              className="text-red-500 hover:text-red-700"
+        {filteredCards.map((card) => {
+          const categoryColor = categories.find((cat) => cat.id === card.categoryId)?.color || '#FFF';
+
+          return (
+            <li
+              key={card.id}
+              style={{ backgroundColor: categoryColor, color: '#000' }}
+              className="flex justify-between items-center p-4 rounded-md shadow"
             >
-              Supprimer
-            </button>
-          </li>
-        ))}
+              <div>
+                <h3 className="font-medium">{card.question}</h3>
+                <p className="text-sm">{card.answer}</p>
+              </div>
+              <button
+                onClick={() => onDelete(card.id)}
+                className="text-red-500 hover:text-red-700"
+              >
+                Supprimer
+              </button>
+            </li>
+          );
+        })}
       </ul>
 
-      {/* Modale pour gérer les catégories */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Gérer les catégories">
         <div>
           <div className="flex gap-2 mb-4">
@@ -103,8 +111,16 @@ const FlashcardList: React.FC<FlashcardListProps> = ({
 
           <ul className="space-y-2">
             {categories.map((category) => (
-              <li key={category.id} className="flex justify-between items-center">
-                <span>{category.name}</span>
+              <li key={category.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span>{category.name}</span>
+                  <input
+                    type="color"
+                    value={category.color}
+                    onChange={(e) => onUpdateCategoryColor(category.id, e.target.value)}
+                    className="w-6 h-6 border-none rounded-full cursor-pointer"
+                  />
+                </div>
                 <button
                   onClick={() => onDeleteCategory(category.id)}
                   className="text-red-500 hover:text-red-700"

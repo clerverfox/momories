@@ -17,11 +17,15 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.question.trim() && formData.answer.trim() && formData.categoryId) {
-      onAdd(formData);
+      onAdd({
+        question: formData.question,
+        answer: formData.answer,
+        categoryId: formData.categoryId, // Associer la carte à la catégorie sélectionnée
+      });
       setFormData({
         question: '',
         answer: '',
-        categoryId: categories.length > 0 ? categories[0].id : '', // Réinitialisation
+        categoryId: categories[0]?.id || '', // Réinitialisation après ajout
       });
     }
   };
@@ -30,6 +34,7 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
     <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">Créer une nouvelle carte</h2>
 
+      {/* Sélection de la catégorie */}
       <div>
         <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
           Catégorie
@@ -49,6 +54,7 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
         </select>
       </div>
 
+      {/* Champ pour la question */}
       <div>
         <label htmlFor="question" className="block text-sm font-medium text-gray-700 mb-1">
           Question
@@ -63,6 +69,7 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
         />
       </div>
 
+      {/* Champ pour la réponse */}
       <div>
         <label htmlFor="answer" className="block text-sm font-medium text-gray-700 mb-1">
           Réponse
@@ -77,6 +84,7 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
         />
       </div>
 
+      {/* Bouton pour ajouter la flashcard */}
       <button
         type="submit"
         className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"

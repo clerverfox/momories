@@ -1,6 +1,7 @@
 export type Category = {
   id: string;
   name: string;
+  color: string;
 };
 
 // Définit une flashcard avec une association à une catégorie
