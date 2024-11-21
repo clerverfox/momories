@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Shuffle, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Flashcard } from '../types';
 
 interface StudyModeProps {
@@ -8,115 +7,89 @@ interface StudyModeProps {
 }
 
 export default function StudyMode({ cards, selectedCategory }: StudyModeProps) {
-  const [currentCards, setCurrentCards] = useState<Flashcard[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [shuffledCards, setShuffledCards] = useState<Flashcard[]>([]);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
 
-  useEffect(() => {
-    const filtered = selectedCategory === 'Toutes'
-      ? [...cards]
-      : cards.filter(card => card.category === selectedCategory);
-    setCurrentCards(filtered);
-    setCurrentIndex(0);
-    setShowAnswer(false);
-  }, [cards, selectedCategory]);
-
+  // Mélanger les cartes lors de l'ouverture ou après un clic sur "Mélanger"
   const shuffleCards = () => {
-    setCurrentCards([...currentCards].sort(() => Math.random() - 0.5));
-    setCurrentIndex(0);
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    setShuffledCards(shuffled);
+    setCurrentCardIndex(0);
     setShowAnswer(false);
   };
 
-  const reset = () => {
-    setCurrentIndex(0);
-    setShowAnswer(false);
-  };
+  // Initialiser les cartes mélangées à l'ouverture
+  useEffect(() => {
+    shuffleCards();
+  }, [cards]);
 
-  const nextCard = () => {
-    if (currentIndex < currentCards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      setShowAnswer(false);
-    }
-  };
-
-  const previousCard = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      setShowAnswer(false);
-    }
-  };
-
-  if (currentCards.length === 0) {
+  if (shuffledCards.length === 0) {
     return (
-      <div className="text-center py-8">
-        <p className="text-gray-600">Aucune carte disponible pour cette catégorie.</p>
+      <div className="text-center text-gray-500 mt-10">
+        Aucune carte n'est disponible pour la catégorie sélectionnée.
       </div>
     );
   }
 
-  const currentCard = currentCards[currentIndex];
+  const currentCard = shuffledCards[currentCardIndex];
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-sm text-gray-500">
-            Carte {currentIndex + 1} sur {currentCards.length}
-          </span>
-          <span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">
-            {currentCard.category}
-          </span>
-        </div>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-semibold text-gray-800 text-center mb-6">
+        Révision : {selectedCategory}
+      </h2>
 
+      <div className="flex flex-col items-center justify-center">
         <div
-          className="min-h-[200px] flex items-center justify-center cursor-pointer"
           onClick={() => setShowAnswer(!showAnswer)}
+          className={`w-80 h-48 flex items-center justify-center text-center bg-white rounded-lg shadow-md cursor-pointer transition-transform transform ${
+            showAnswer ? 'rotate-y-180' : ''
+          }`}
+          style={{
+            perspective: '1000px',
+            backgroundColor: '#FFF',
+          }}
         >
-          <p className="text-xl text-center">
-            {showAnswer ? currentCard.answer : currentCard.question}
-          </p>
+          {showAnswer ? (
+            <p className="text-gray-700 font-medium">{currentCard.answer}</p>
+          ) : (
+            <p className="text-gray-900 font-semibold">{currentCard.question}</p>
+          )}
         </div>
-
-        <div className="flex justify-center gap-4 mt-6">
-          <button
-            onClick={previousCard}
-            disabled={currentIndex === 0}
-            className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Précédent"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <button
-            onClick={() => setShowAnswer(!showAnswer)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-          >
-            {showAnswer ? 'Voir question' : 'Voir réponse'}
-          </button>
-          <button
-            onClick={nextCard}
-            disabled={currentIndex === currentCards.length - 1}
-            className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Suivant"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
+        <p className="text-sm text-gray-500 mt-2">Cliquez sur la carte pour voir la réponse</p>
       </div>
 
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-between items-center mt-6">
         <button
-          onClick={shuffleCards}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          onClick={() => {
+            if (currentCardIndex > 0) {
+              setCurrentCardIndex(currentCardIndex - 1);
+              setShowAnswer(false);
+            }
+          }}
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+          disabled={currentCardIndex === 0}
         >
-          <Shuffle size={20} />
+          Précédent
+        </button>
+        <button
+          onClick={() => shuffleCards()}
+          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+        >
           Mélanger
         </button>
         <button
-          onClick={reset}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+          onClick={() => {
+            if (currentCardIndex < shuffledCards.length - 1) {
+              setCurrentCardIndex(currentCardIndex + 1);
+              setShowAnswer(false);
+            }
+          }}
+          className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
+          disabled={currentCardIndex === shuffledCards.length - 1}
         >
-          <RotateCcw size={20} />
-          Réinitialiser
+          Suivant
         </button>
       </div>
     </div>
