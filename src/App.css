@@ -1,0 +1,55 @@
+/* Globaux */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #f9fafb;
+    color: #333;
+  }
+  
+  h1, h2, h3 {
+    margin: 0;
+  }
+  
+  /* Boutons interactifs */
+  button {
+    cursor: pointer;
+    border: none;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    transform: scale(1.05);
+  }
+  
+  button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Navigation */
+  footer button {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 50%;
+  }
+  
+  /* Liste des cartes */
+  .list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .list-container .card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .list-container .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  }
+  

@@ -11,21 +11,20 @@ export default function FlashcardForm({ onAdd, categories }: FlashcardFormProps)
   const [formData, setFormData] = useState({
     question: '',
     answer: '',
-    categoryId: categories.length > 0 ? categories[0].id : '', // Catégorie par défaut
+    categoryId: categories.length > 0 ? categories[0].id : '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.question.trim() && formData.answer.trim() && formData.categoryId) {
       onAdd({
-        question: formData.question,
-        answer: formData.answer,
-        categoryId: formData.categoryId, // Associe la carte à la catégorie
+        ...formData,
+        categoryId: formData.categoryId,
       });
       setFormData({
         question: '',
         answer: '',
-        categoryId: categories[0]?.id || '', // Réinitialise après soumission
+        categoryId: categories[0]?.id || '',
       });
     }
   };

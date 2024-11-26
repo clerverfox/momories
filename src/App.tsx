@@ -5,89 +5,107 @@ import FlashcardForm from './components/FlashcardForm';
 import FlashcardList from './components/FlashcardList';
 import StudyMode from './components/StudyMode';
 import StudySelection from './components/StudySelection';
+import './App.css';
 
 function App() {
   const [cards, setCards] = useState<Flashcard[]>([]);
   const [view, setView] = useState<'create' | 'list' | 'study'>('create');
   const [studyCategory, setStudyCategory] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([
-    { id: crypto.randomUUID(), name: 'Général', color: '#FFD6A5' }, // Exemple de catégorie par défaut
+    { id: crypto.randomUUID(), name: 'Général', color: '#FF9AA2' },
+    { id: crypto.randomUUID(), name: 'Sciences', color: '#FFDAC1' },
   ]);
 
-  // Ajouter une catégorie avec une couleur pastel aléatoire
   const addCategory = (name: string) => {
-    const pastelColors = ['#FFD6A5', '#B9FBC0', '#A0C4FF', '#FFABAB', '#D3ABFF'];
-    const randomColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
-
+    const vibrantColors = ['#FF9AA2', '#FFDAC1', '#B5EAD7', '#C7CEEA', '#A0E7E5'];
+    const randomColor = vibrantColors[Math.floor(Math.random() * vibrantColors.length)];
     const newCategory: Category = { id: crypto.randomUUID(), name, color: randomColor };
     setCategories((prev) => [...prev, newCategory]);
   };
 
-  // Supprimer une catégorie
   const deleteCategory = (id: string) => {
     setCategories((prev) => prev.filter((category) => category.id !== id));
   };
 
-  // Mettre à jour une catégorie (exemple : couleur)
-  const updateCategoryColor = (id: string, color: string) => {
-    setCategories((prev) =>
-      prev.map((cat) => (cat.id === id ? { ...cat, color } : cat))
-    );
-  };
-
-  // Ajouter une flashcard
   const addCard = (card: Omit<Flashcard, 'id'>) => {
     const newCard: Flashcard = { ...card, id: crypto.randomUUID() };
     setCards([...cards, newCard]);
   };
 
-  // Supprimer une flashcard
   const deleteCard = (id: string) => {
     setCards(cards.filter((card) => card.id !== id));
   };
 
-  // Classe CSS pour les boutons de navigation
   const getButtonClass = (active: boolean) =>
-    `flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
-      active ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+    `flex items-center justify-center w-14 h-14 rounded-full shadow-lg transition-transform ${
+      active
+        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white scale-105'
+        : 'bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 hover:bg-gradient-to-r hover:from-purple-400 hover:to-pink-400 hover:text-white hover:scale-105'
     }`;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-white to-gray-200 font-sans">
       {/* HEADER */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900 py-4">FlashCards</h1>
+      <header className="bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <Brain size={32} className="text-white" />
+            <h1 className="text-3xl font-bold">Momories</h1>
+          </div>
         </div>
       </header>
 
       {/* MAIN CONTENT */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-20">
-        {/* Vue "Créer" */}
-        {view === 'create' && <FlashcardForm onAdd={addCard} categories={categories} />}
-
-        {/* Vue "Liste" */}
-        {view === 'list' && (
-          <FlashcardList
-            cards={cards}
-            onDelete={deleteCard}
-            selectedCategory={'Toutes'}
-            onCategoryChange={() => {}} // Option inutilisée ici
-            categories={categories}
-            onAddCategory={addCategory}
-            onDeleteCategory={deleteCategory}
-            onUpdateCategoryColor={updateCategoryColor}
-          />
+      <main className="max-w-4xl mx-auto px-4 py-6">
+        {view === 'create' && (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-4 text-purple-500 text-center">
+              Créez une nouvelle carte
+            </h2>
+            <FlashcardForm onAdd={addCard} categories={categories} />
+          </div>
         )}
 
-        {/* Vue "Réviser" */}
+        {view === 'list' && (
+          <div className="bg-white rounded-xl shadow-lg p-6 space-y-6">
+            <h2 className="text-xl font-semibold text-purple-500 text-center">
+              Liste des cartes
+            </h2>
+            <FlashcardList
+              cards={cards}
+              onDelete={deleteCard}
+              selectedCategory={'Toutes'}
+              onCategoryChange={(id) => setStudyCategory(id)}
+              categories={categories}
+              onAddCategory={addCategory}
+              onDeleteCategory={deleteCategory}
+            />
+          </div>
+        )}
+
         {view === 'study' && (
-          <>
+          <div className="bg-white rounded-xl shadow-lg p-6">
             {!studyCategory ? (
-              <StudySelection
-                categories={categories}
-                onSelectCategory={(id) => setStudyCategory(id)}
-              />
+              <div className="flex flex-col items-center space-y-8">
+                <h2 className="text-2xl font-bold text-purple-600 text-center">
+                  Choisissez une catégorie à réviser
+                </h2>
+                <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      className="rounded-lg shadow-lg px-6 py-4 text-lg font-semibold text-gray-800 hover:scale-110 transition-transform duration-300"
+                      style={{
+                        backgroundColor: category.color,
+                        color: '#000',
+                      }}
+                      onClick={() => setStudyCategory(category.id)}
+                    >
+                      <span>{category.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ) : (
               <StudyMode
                 cards={cards.filter((card) => card.categoryId === studyCategory)}
@@ -96,36 +114,33 @@ function App() {
                 }
               />
             )}
-          </>
+          </div>
         )}
       </main>
 
       {/* FOOTER */}
-      <footer className="fixed bottom-0 left-0 w-full bg-white shadow-sm py-3">
-        <div className="max-w-7xl mx-auto px-4 flex justify-around">
+      <footer className="bg-white shadow-inner py-6 fixed bottom-0 w-full">
+        <div className="max-w-4xl mx-auto flex justify-around px-4">
           <button
             onClick={() => setView('create')}
             className={getButtonClass(view === 'create')}
           >
-            <Plus size={20} />
-            Créer
+            <Plus size={24} />
           </button>
           <button
             onClick={() => setView('list')}
             className={getButtonClass(view === 'list')}
           >
-            <List size={20} />
-            Liste
+            <List size={24} />
           </button>
           <button
             onClick={() => {
               setView('study');
-              setStudyCategory(null); // Réinitialise la sélection
+              setStudyCategory(null);
             }}
             className={getButtonClass(view === 'study')}
           >
-            <Brain size={20} />
-            Réviser
+            <Brain size={24} />
           </button>
         </div>
       </footer>
